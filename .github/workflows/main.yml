@@ -1,10 +1,10 @@
-name: Setup ngrok v3 with HTTP Tunnel
+name: Ngrok Tunnel with Keep Alive
 
 on:
   workflow_dispatch:
 
 jobs:
-  setup-ngrok:
+  ngrok:
     runs-on: windows-latest
     timeout-minutes: 360
 
@@ -34,3 +34,5 @@ jobs:
           $json = Invoke-RestMethod http://127.0.0.1:4040/api/tunnels
           $url = $json.tunnels[0].public_url
           Write-Host "🌍 Your public ngrok URL is: $url"
+          # Keep tunnel alive for 6h
+          Start-Sleep -Seconds 21600
