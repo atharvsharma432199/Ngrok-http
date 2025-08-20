@@ -1,4 +1,4 @@
-name: Setup ngrok (classic) with HTTP Tunnel
+name: Setup ngrok v3 with HTTP Tunnel
 
 on:
   workflow_dispatch:
@@ -12,22 +12,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download ngrok v2 (classic)
+      - name: Download ngrok v3
         run: |
-          Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+          Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
           Expand-Archive ngrok.zip -DestinationPath .
           if (!(Test-Path .\ngrok.exe)) { throw "❌ Failed to extract ngrok." }
 
       - name: Authenticate ngrok
-        run: .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+        run: .\ngrok.exe config add-authtoken $Env:NGROK_AUTH_TOKEN
         env:
           NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
-      - name: Start ngrok tunnel (http 5000, account’s default region)
+      - name: Start ngrok tunnel (http 5000)
         run: |
           Start-Process -FilePath .\ngrok.exe -ArgumentList "http 5000" -NoNewWindow
           Start-Sleep -Seconds 8
           $json = Invoke-RestMethod http://127.0.0.1:4040/api/tunnels
           $url = $json.tunnels[0].public_url
           Write-Host "🌍 Your public ngrok URL is: $url"
-          
